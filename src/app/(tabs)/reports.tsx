@@ -16,6 +16,7 @@ import { formatMonthYear } from '../../utils/date';
 import { formatRupiah } from '../../utils/currency';
 import { CategoryIcon } from '../../components/ui/CategoryIcon';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { PieChart } from '../../components/ui/PieChart';
 
 export default function ReportsScreen() {
   const colorScheme = useColorScheme();
@@ -61,9 +62,6 @@ export default function ReportsScreen() {
 
   const totalIn = report?.totalIncome || 0;
   const totalOut = report?.totalExpense || 0;
-  const totalFlow = totalIn + totalOut;
-  const incomeRatio = totalFlow > 0 ? (totalIn / totalFlow) * 100 : 50;
-  const expenseRatio = totalFlow > 0 ? (totalOut / totalFlow) * 100 : 50;
 
   const activeCategories =
     activeTab === 'expense'
@@ -126,79 +124,65 @@ export default function ReportsScreen() {
           { paddingBottom: Math.max(insets.bottom, 20) + 80 },
         ]}
       >
-        {/* Ringkasan Arus Kas Bulan Terpilih */}
+        {/* Ringkasan Arus Kas Bulan Terpilih (Pie Chart) */}
         <View
           style={[
             styles.cashFlowCard,
             { backgroundColor: theme.surface, borderColor: theme.border },
           ]}
         >
-          <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>
-            Arus Kas Bulanan
-          </Text>
-
-          <View style={styles.flowNumbersRow}>
-            <View style={styles.flowItem}>
-              <Text style={[styles.flowLabel, { color: theme.textSecondary }]}>
-                Pemasukan
-              </Text>
-              <Text style={[styles.incomeVal, { color: theme.income }]}>
-                +{formatRupiah(totalIn)}
-              </Text>
-            </View>
-
-            <View style={[styles.verticalLine, { backgroundColor: theme.border }]} />
-
-            <View style={styles.flowItem}>
-              <Text style={[styles.flowLabel, { color: theme.textSecondary }]}>
-                Pengeluaran
-              </Text>
-              <Text style={[styles.expenseVal, { color: theme.expense }]}>
-                -{formatRupiah(totalOut)}
-              </Text>
-            </View>
-          </View>
-
-          {/* Bar Proporsional Arus Kas */}
-          <View style={styles.ratioBarContainer}>
-            <View
-              style={[
-                styles.ratioSegment,
-                { width: `${incomeRatio}%`, backgroundColor: theme.income },
-              ]}
-            />
-            <View
-              style={[
-                styles.ratioSegment,
-                { width: `${expenseRatio}%`, backgroundColor: theme.expense },
-              ]}
-            />
-          </View>
-
-          {/* Saldo Bersih Bulan Ini */}
-          <View
-            style={[
-              styles.netBox,
-              {
-                backgroundColor: theme.surfaceSubtle,
-              },
-            ]}
-          >
-            <Text style={[styles.netLabel, { color: theme.textSecondary }]}>
-              Selisih Bersih (Tabungan):
+          <View style={styles.cardHeaderRow}>
+            <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>
+              Arus Kas Bulanan
             </Text>
-            <Text
+            <View
               style={[
-                styles.netValue,
+                styles.statusBadge,
                 {
-                  color: (report?.netBalance || 0) >= 0 ? theme.income : theme.expense,
+                  backgroundColor:
+                    (report?.netBalance || 0) >= 0 ? `${theme.income}15` : `${theme.expense}15`,
                 },
               ]}
             >
-              {(report?.netBalance || 0) >= 0 ? '+' : ''}
-              {formatRupiah(report?.netBalance || 0)}
-            </Text>
+              <Text
+                style={[
+                  styles.statusBadgeText,
+                  {
+                    color:
+                      (report?.netBalance || 0) >= 0 ? theme.income : theme.expense,
+                  },
+                ]}
+              >
+                {(report?.netBalance || 0) >= 0 ? 'Surplus' : 'Defisit'}
+              </Text>
+            </View>
           </View>
+
+          {/* Donut / Pie Chart Arus Kas */}
+          <PieChart
+            data={[
+              {
+                key: 'income',
+                label: 'Pemasukan',
+                value: totalIn,
+                color: theme.income,
+                prefix: '+',
+              },
+              {
+                key: 'expense',
+                label: 'Pengeluaran',
+                value: totalOut,
+                color: theme.expense,
+                prefix: '-',
+              },
+            ]}
+            size={180}
+            strokeWidth={22}
+            centerLabel="Saldo Bersih"
+            centerValue={`${(report?.netBalance || 0) >= 0 ? '+' : ''}${formatRupiah(report?.netBalance || 0)}`}
+            centerValueColor={(report?.netBalance || 0) >= 0 ? theme.income : theme.expense}
+            showLegend={true}
+          />
         </View>
 
         {/* Tab Switch Breakdown Pengeluaran vs Pemasukan */}
@@ -355,58 +339,20 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     marginBottom: Spacing.two,
   },
-  flowNumbersRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: Spacing.one,
-  },
-  flowItem: {
-    flex: 1,
-  },
-  verticalLine: {
-    width: 1,
-    height: 36,
-    marginHorizontal: Spacing.two,
-  },
-  flowLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  incomeVal: {
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  expenseVal: {
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  ratioBarContainer: {
-    flexDirection: 'row',
-    height: 8,
-    borderRadius: Radius.full,
-    overflow: 'hidden',
-    marginTop: Spacing.three,
-    marginBottom: Spacing.two,
-  },
-  ratioSegment: {
-    height: '100%',
-  },
-  netBox: {
+  cardHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
-    borderRadius: Radius.lg,
-    marginTop: Spacing.two,
+    marginBottom: Spacing.one,
   },
-  netLabel: {
-    fontSize: 13,
-    fontWeight: '600',
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: Radius.full,
   },
-  netValue: {
-    fontSize: 14,
-    fontWeight: '800',
+  statusBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
   },
   tabSwitch: {
     flexDirection: 'row',
