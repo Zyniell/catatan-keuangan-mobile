@@ -7,8 +7,8 @@ import {
   StyleSheet,
   RefreshControl,
   useColorScheme,
-  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Radius, Spacing } from '../../constants/theme';
@@ -20,6 +20,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? Colors.dark : Colors.light;
+  const insets = useSafeAreaInsets();
 
   const { recentTransactions, summary, refreshData } = useFinance();
   const [refreshing, setRefreshing] = useState(false);
@@ -39,6 +40,7 @@ export default function HomeScreen() {
           {
             backgroundColor: theme.surface,
             borderBottomColor: theme.border,
+            paddingTop: Math.max(insets.top, 24) + 12,
           },
         ]}
       >
@@ -60,7 +62,10 @@ export default function HomeScreen() {
 
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={[
+          styles.contentContainer,
+          { paddingBottom: Math.max(insets.bottom, 20) + 80 },
+        ]}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -143,7 +148,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: Spacing.four,
-    paddingTop: Platform.OS === 'ios' ? 56 : 24,
     paddingBottom: Spacing.three,
     borderBottomWidth: 1,
   },

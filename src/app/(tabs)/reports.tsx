@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   useColorScheme,
-  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Radius, Spacing } from '../../constants/theme';
 import { useFinance } from '../../context/FinanceContext';
@@ -20,6 +20,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 export default function ReportsScreen() {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? Colors.dark : Colors.light;
+  const insets = useSafeAreaInsets();
 
   const { getMonthlyReport, allTransactions } = useFinance();
 
@@ -78,6 +79,7 @@ export default function ReportsScreen() {
           {
             backgroundColor: theme.surface,
             borderBottomColor: theme.border,
+            paddingTop: Math.max(insets.top, 24) + 12,
           },
         ]}
       >
@@ -119,7 +121,10 @@ export default function ReportsScreen() {
 
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={[
+          styles.contentContainer,
+          { paddingBottom: Math.max(insets.bottom, 20) + 80 },
+        ]}
       >
         {/* Ringkasan Arus Kas Bulan Terpilih */}
         <View
@@ -298,7 +303,6 @@ export default function ReportsScreen() {
 const styles = StyleSheet.create({
   header: {
     paddingHorizontal: Spacing.four,
-    paddingTop: Platform.OS === 'ios' ? 56 : 24,
     paddingBottom: Spacing.three,
     borderBottomWidth: 1,
   },

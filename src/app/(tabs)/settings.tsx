@@ -7,8 +7,8 @@ import {
   StyleSheet,
   Alert,
   useColorScheme,
-  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system/legacy';
@@ -20,6 +20,7 @@ import { CategoryIcon } from '../../components/ui/CategoryIcon';
 export default function SettingsScreen() {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? Colors.dark : Colors.light;
+  const insets = useSafeAreaInsets();
 
   const {
     categories,
@@ -130,6 +131,7 @@ export default function SettingsScreen() {
           {
             backgroundColor: theme.surface,
             borderBottomColor: theme.border,
+            paddingTop: Math.max(insets.top, 24) + 12,
           },
         ]}
       >
@@ -138,7 +140,10 @@ export default function SettingsScreen() {
 
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={[
+          styles.contentContainer,
+          { paddingBottom: Math.max(insets.bottom, 20) + 80 },
+        ]}
       >
         {/* Banner Offline & Privasi */}
         <View
@@ -310,7 +315,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   header: {
     paddingHorizontal: Spacing.four,
-    paddingTop: Platform.OS === 'ios' ? 56 : 24,
     paddingBottom: Spacing.three,
     borderBottomWidth: 1,
   },

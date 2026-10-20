@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Radius, Spacing } from '../../constants/theme';
@@ -24,6 +25,7 @@ import { CategoryIcon } from '../../components/ui/CategoryIcon';
 export default function TransactionModal() {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? Colors.dark : Colors.light;
+  const insets = useSafeAreaInsets();
 
   const { id } = useLocalSearchParams<{ id?: string }>();
   const isEditing = Boolean(id);
@@ -138,6 +140,7 @@ export default function TransactionModal() {
           {
             backgroundColor: theme.surface,
             borderBottomColor: theme.border,
+            paddingTop: Math.max(insets.top, 20) + 12,
           },
         ]}
       >
@@ -168,7 +171,10 @@ export default function TransactionModal() {
 
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={[
+          styles.contentContainer,
+          { paddingBottom: Math.max(insets.bottom, 24) + 30 },
+        ]}
         keyboardShouldPersistTaps="handled"
       >
         {/* Toggle Tipe: Pengeluaran vs Pemasukan */}
@@ -413,7 +419,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.four,
-    paddingTop: Platform.OS === 'ios' ? 56 : 20,
     paddingBottom: Spacing.three,
     borderBottomWidth: 1,
   },

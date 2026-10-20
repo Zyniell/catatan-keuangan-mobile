@@ -1,12 +1,18 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme, Platform } from 'react-native';
+import { useColorScheme } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/theme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? Colors.dark : Colors.light;
+  const insets = useSafeAreaInsets();
+
+  // Pastikan ada jarak bawah yang lega dan aman dari bilah gestur navigasi Android
+  const bottomInset = Math.max(insets.bottom, 14);
+  const tabHeight = 60 + bottomInset;
 
   return (
     <Tabs
@@ -17,14 +23,15 @@ export default function TabLayout() {
           backgroundColor: theme.surface,
           borderTopColor: theme.border,
           borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 88 : 64,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 10,
+          height: tabHeight,
+          paddingBottom: bottomInset,
           paddingTop: 8,
           elevation: 8,
         },
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '700',
+          marginBottom: 2,
         },
         headerShown: false,
       }}
